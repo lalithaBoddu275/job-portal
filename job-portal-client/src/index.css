@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Tailwind base extension */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Hide scrollbar */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom class names */
+.rich-text {
+  font-size: 15px;
+  color: #7A7B7D;
+}
+
+.rich-text p {
+  margin-bottom: 1rem;
+}
+
+.rich-text h1,
+.rich-text h2 {
+  font-size: 2.25rem; /* 36px */
+  font-weight: 800;
+  color: #252525;
+  margin: 1rem 0;
+}
+
+.rich-text h3 {
+  font-size: 1.125rem; /* 18px */
+  font-weight: 600;
+  color: #333333;
+  margin: 0.75rem 0;
+}
+
+.rich-text h4 {
+  font-size: 1rem; /* 16px */
+  font-weight: 500;
+  color: #444444;
+  margin: 0.5rem 0;
+}
+
+.rich-text h5 {
+  font-size: 0.875rem; /* 14px */
+  font-weight: 400;
+  color: #555555;
+  margin: 0.5rem 0;
+}
+
+.rich-text h6 {
+  font-size: 0.75rem; /* 12px */
+  font-weight: 400;
+  color: #666666;
+  margin: 0.5rem 0;
+}
+
+.rich-text strong {
+  font-weight: 700;
+}
+
+.rich-text ol {
+  margin: 1rem 0 1rem 2rem;
+  list-style-type: decimal;
+}
+
+.rich-text ul {
+  margin: 1rem 0 1rem 2rem;
+  list-style-type: disc;
+}
+
+.rich-text li {
+  margin-bottom: 0.5rem;
+}
