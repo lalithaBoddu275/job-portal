@@ -1,27 +1,88 @@
 import React, { useState, useContext, useEffect } from "react";
 import { AppContext } from "../context/AppContext";
-import { assets } from "../assets/assets"; // Make sure this exists
+import { assets } from "../assets/assets";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Recruiterlogin = () => {
+  const navigate = useNavigate();
   const [state, setState] = useState("login");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [image, setImage] = useState(false);
+  const [image, setImage] = useState(null);
   const [isTextDataSubmitted, setIsTextDataSubmitted] = useState(false);
 
-  const { setShowRecruiterLogin } = useContext(AppContext);
+  const {
+    setShowRecruiterLogin,
+    backendUrl,
+    setCompanyToken,
+    setCompanyData,
+  } = useContext(AppContext);
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+
     if (state === "signup" && !isTextDataSubmitted) {
-      setIsTextDataSubmitted(true);
+      if (!name || !email || !password) {
+        toast.error("Please fill all fields");
+        return;
+      }
+      return setIsTextDataSubmitted(true);
     }
-    // Add actual login/signup logic here
+
+    try {
+      if (state === "login") {
+        const { data } = await axios.post(`${backendUrl}/api/company/login`, {
+          email,
+          password,
+        });
+
+        if (data.success) {
+          setCompanyData(data.company);
+          setCompanyToken(data.token);
+          localStorage.setItem("companyToken", data.token);
+          setShowRecruiterLogin(false);
+          navigate("/dashboard");
+        } else {
+          toast.error(data.message);
+        }
+      } else {
+        if (!image) {
+          toast.error("Please upload a company logo.");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("password", password);
+        formData.append("email", email);
+        formData.append("image", image);
+
+        const { data } = await axios.post(
+          `${backendUrl}/api/company/register`,
+          formData
+        );
+
+        if (data.success) {
+          toast.success("Account created successfully");
+          setCompanyData(data.company);
+          setCompanyToken(data.token);
+          localStorage.setItem("companyToken", data.token);
+          setShowRecruiterLogin(false);
+          navigate("/dashboard");
+        } else {
+          toast.error(data.message);
+        }
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
   };
 
   useEffect(() => {
-    document.body.style.overflow = "hidden"; // Prevent scrolling behind modal
+    document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = "unset";
     };
@@ -37,22 +98,23 @@ const Recruiterlogin = () => {
           Recruiter {state}
         </h1>
         <p className="text-sm mb-4">
-          Welcome back! Please {state === "login" ? "sign in" : "sign up"} to
-          continue.
+          Welcome back! Please {state === "login" ? "sign in" : "sign up"} to continue.
         </p>
 
+        {/* Signup - Image Upload Step */}
         {state === "signup" && isTextDataSubmitted ? (
           <div className="mb-5 text-center">
             <label htmlFor="image" className="cursor-pointer">
               <img
                 className="w-16 h-16 mx-auto rounded-full"
                 src={image ? URL.createObjectURL(image) : assets.upload_area}
-                alt=""
+                alt="Upload Preview"
               />
               <input
                 onChange={(e) => setImage(e.target.files[0])}
                 type="file"
                 id="image"
+                accept="image/*"
                 hidden
               />
               <p className="text-sm mt-2">Upload Company Logo</p>
@@ -60,12 +122,13 @@ const Recruiterlogin = () => {
           </div>
         ) : (
           <>
-            {state !== "login" && (
+            {state === "signup" && (
               <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
-                <img src={assets.person_icon} alt="" />
+                <img src={assets.person_icon} alt="person" />
                 <input
                   className="outline-none text-sm"
                   onChange={(e) => setName(e.target.value)}
+                  value={name}
                   type="text"
                   placeholder="Company Name"
                   required
@@ -74,7 +137,7 @@ const Recruiterlogin = () => {
             )}
 
             <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
-              <img src={assets.email_icon} alt="" />
+              <img src={assets.email_icon} alt="email" />
               <input
                 className="outline-none text-sm"
                 onChange={(e) => setEmail(e.target.value)}
@@ -86,7 +149,7 @@ const Recruiterlogin = () => {
             </div>
 
             <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
-              <img src={assets.lock_icon} alt="" />
+              <img src={assets.lock_icon} alt="lock" />
               <input
                 className="outline-none text-sm"
                 onChange={(e) => setPassword(e.target.value)}
@@ -122,7 +185,10 @@ const Recruiterlogin = () => {
               Don’t have an account?{" "}
               <span
                 className="text-blue-600 cursor-pointer"
-                onClick={() => setState("signup")}
+                onClick={() => {
+                  setState("signup");
+                  setIsTextDataSubmitted(false);
+                }}
               >
                 Signup
               </span>
@@ -132,7 +198,10 @@ const Recruiterlogin = () => {
               Already have an account?{" "}
               <span
                 className="text-blue-600 cursor-pointer"
-                onClick={() => setState("login")}
+                onClick={() => {
+                  setState("login");
+                  setIsTextDataSubmitted(false);
+                }}
               >
                 Login
               </span>

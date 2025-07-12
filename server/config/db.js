@@ -2,15 +2,19 @@ import mongoose from 'mongoose';
 
 const connectDB = async () => {
   try {
-    mongoose.connection.on('connected', () => console.log('✅ MongoDB connected'));
-
-    await mongoose.connect(`${process.env.MONGODB_URI}job-portal`, {
-      dbName: 'job-portal', // explicitly set db name
+    // Listen for successful connection
+    mongoose.connection.on('connected', () => {
+      console.log('✅ MongoDB connected');
     });
+
+    // Connect using the MONGODB_URI from .env
+    await mongoose.connect(process.env.MONGODB_URI);
+
   } catch (error) {
-    console.error(' MongoDB connection error:', error.message);
-    process.exit(1); // stop the app if DB fails
+    console.error('❌ MongoDB connection error:', error.message);
+    process.exit(1); // Stop the app if DB fails
   }
 };
 
 export default connectDB;
+

@@ -22,7 +22,9 @@ const JobCard = ({ job }) => {
       </div>
 
       {/* Job Title */}
-      <h4 className="font-medium text-xl mt-2 text-gray-800">{job.title}</h4>
+      <h4 className="font-medium text-xl mt-2 text-gray-800">
+        {job.title || 'Untitled Job'}
+      </h4>
 
       {/* Location and Level */}
       <div className="flex items-center gap-3 mt-2 text-xs">

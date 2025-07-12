@@ -9,6 +9,7 @@ const Footer = () => {
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
   <img
     src={assets.clogo}
+    
     alt="Logo"
     className="w-10 h-10 font-serif object-contain"
   />

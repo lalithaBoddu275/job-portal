@@ -9,8 +9,9 @@ import Addjob from './pages/Addjob';
 import Managejob from './pages/Managejobs';
 import ViewApplication from './pages/ViewApplications';
 import { AppContext } from './context/AppContext';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import 'quill/dist/quill.snow.css';
-
 import './App.css';
 
 function App() {
@@ -20,12 +21,25 @@ function App() {
     <div>
       {showRecruiterLogin && <Recruiterlogin />}
 
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/apply-job/:id" element={<Applyjob />} />
         <Route path="/applications" element={<Applications />} />
 
-        {/* Nest dashboard subpages */}
+        {/* Dashboard with always-available nested routes */}
         <Route path="/dashboard" element={<Dashboard />}>
           <Route path="add-job" element={<Addjob />} />
           <Route path="manage-jobs" element={<Managejob />} />

@@ -3,6 +3,10 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import { JobCategories, JobLocations } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import "react-toastify/dist/ReactToastify.css";
 
 const Addjob = () => {
   const [title, setTitle] = useState("");
@@ -12,8 +16,15 @@ const Addjob = () => {
   const [salary, setSalary] = useState(0);
   const editorRef = useRef(null);
   const quillRef = useRef(null);
+  const { backendUrl, companyToken } = useContext(AppContext);
+  const navigate = useNavigate();
 
-  const { jobs } = useContext(AppContext); // if needed later
+  // 🚨 Redirect if not logged in as company
+  useEffect(() => {
+    if (!companyToken) {
+      navigate("/"); // or navigate to login
+    }
+  }, [companyToken, navigate]);
 
   useEffect(() => {
     if (!quillRef.current && editorRef.current) {
@@ -22,7 +33,6 @@ const Addjob = () => {
       });
     }
 
-    // cleanup if needed
     return () => {
       if (quillRef.current) {
         quillRef.current = null;
@@ -30,19 +40,27 @@ const Addjob = () => {
     };
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const description = quillRef.current?.root.innerHTML;
-    const jobData = {
-      title,
-      location,
-      category,
-      level,
-      salary,
-      description,
-    };
-    console.log("New Job Posted:", jobData);
-    // You can now send jobData to backend
+    try {
+      const description = quillRef.current?.root.innerHTML;
+      const { data } = await axios.post(
+        backendUrl + "/api/company/post-job",
+        { title, description, location, salary, category, level },
+        { headers: { token: companyToken } }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        setTitle("");
+        setSalary(0);
+        quillRef.current.root.innerHTML = "";
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -55,6 +73,7 @@ const Addjob = () => {
         <input
           type="text"
           placeholder="Type here"
+          value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
           className="w-full px-3 py-2 border-2 border-gray-300 rounded"
@@ -70,6 +89,7 @@ const Addjob = () => {
         <div>
           <p className="mb-2 font-medium">Job Category</p>
           <select
+            value={category}
             onChange={(e) => setCategory(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded"
           >
@@ -84,6 +104,7 @@ const Addjob = () => {
         <div>
           <p className="mb-2 font-medium">Job Location</p>
           <select
+            value={location}
             onChange={(e) => setLocation(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded"
           >
@@ -98,6 +119,7 @@ const Addjob = () => {
         <div>
           <p className="mb-2 font-medium">Job Level</p>
           <select
+            value={level}
             onChange={(e) => setLevel(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded"
           >
@@ -114,6 +136,7 @@ const Addjob = () => {
           type="number"
           min={0}
           placeholder="2500"
+          value={salary}
           onChange={(e) => setSalary(e.target.value)}
           className="w-40 px-3 py-2 border-2 border-gray-300 rounded"
         />
