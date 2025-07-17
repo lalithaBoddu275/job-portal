@@ -1,26 +1,29 @@
 import React, { useContext, useState, useEffect } from 'react';
-
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import { AppContext } from '../context/AppContext';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const { companyData, setCompanyData, setCompanyToken } = useContext(AppContext);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // Function to logout for company
+  // Logout function
   const logout = () => {
     setCompanyToken(null);
     localStorage.removeItem('companyToken');
     setCompanyData(null);
     navigate('/');
   };
-  useEffect(()=>{
-    if(companyData){
-      navigate('/dashboard/manage-jobs')
+
+  // Redirect recruiter to manage-jobs on login (only if not already there)
+  useEffect(() => {
+    if (companyData && location.pathname === '/dashboard') {
+      navigate('/dashboard/manage-jobs');
     }
-  },[companyData])
+  }, [companyData, location.pathname, navigate]);
 
   return (
     <div className='min-h-screen'>
@@ -31,7 +34,7 @@ const Dashboard = () => {
             <img
               src={assets.clogo}
               alt="Logo"
-              className="w-20 h-20 font-serif object-contain"
+              className="w-20 h-20 object-contain"
             />
             <span className="text-4xl font-semibold text-blue-900">HireNest</span>
           </div>
@@ -64,7 +67,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Layout */}
+      {/* Main Layout */}
       <div className='flex'>
         {/* Sidebar */}
         <div className='w-64 min-h-screen border-r-2'>
@@ -107,7 +110,7 @@ const Dashboard = () => {
           </ul>
         </div>
 
-        {/* Main Content Area */}
+        {/* Main Dashboard Content */}
         <div className='flex-1 p-6'>
           <Outlet />
         </div>

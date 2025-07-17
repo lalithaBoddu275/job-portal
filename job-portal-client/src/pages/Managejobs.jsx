@@ -2,19 +2,19 @@ import React, { useContext, useState, useEffect } from 'react';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
-import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance'; // ✅ use your instance here
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Managejob = () => {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
-  const { backendUrl, companyToken } = useContext(AppContext);
+  const { companyToken } = useContext(AppContext);
 
   const changeJobVisibility = async (id) => {
     try {
-      const { data } = await axios.post(
-        backendUrl + '/api/company/change-visibility', // ✅ fixed spelling here
+      const { data } = await axiosInstance.post(
+        '/api/company/change-visibility',
         { id },
         {
           headers: { token: companyToken },
@@ -33,7 +33,7 @@ const Managejob = () => {
 
   const fetchCompanyJobs = async () => {
     try {
-      const { data } = await axios.get(backendUrl + '/api/company/list-jobs', {
+      const { data } = await axiosInstance.get('/api/company/list-jobs', {
         headers: { token: companyToken },
       });
       if (data.success) {

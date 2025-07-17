@@ -4,7 +4,7 @@ import Footer from '../components/Footer';
 import { assets } from '../assets/assets';
 import moment from 'moment';
 import { useUser, useAuth } from '@clerk/clerk-react';
-import axios from 'axios';
+import axiosInstance from '../axiosInstance'; // ✅ use this instead of axios
 import { toast } from 'react-toastify';
 import { AppContext } from '../context/AppContext';
 
@@ -14,7 +14,7 @@ const Applications = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [resume, setResume] = useState(null);
 
-  const { backendUrl, userData, userApplications, fetchUserData, fetchUserApplications } = useContext(AppContext);
+  const { userData, userApplications, fetchUserData, fetchUserApplications } = useContext(AppContext);
 
   const updateResume = async () => {
     try {
@@ -22,8 +22,8 @@ const Applications = () => {
       formData.append('resume', resume);
 
       const token = await getToken();
-      const { data } = await axios.post(
-        `${backendUrl}/api/users/update-resume`,
+      const { data } = await axiosInstance.post(
+        '/api/users/update-resume',
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

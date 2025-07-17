@@ -1,12 +1,11 @@
 import { createContext, useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import axios from "axios";
+import axiosInstance from "../axiosInstance"; // ✅ Use instance instead of axios
 import { useUser, useAuth } from "@clerk/clerk-react";
 
 export const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const { user } = useUser();
   const { getToken } = useAuth();
 
@@ -19,10 +18,10 @@ export const AppContextProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [userApplications, setUserApplications] = useState([]); // ✅ FIXED from null to []
 
-  // Fetch all jobs
+  // ✅ Fetch all jobs
   const fetchJobs = async () => {
     try {
-      const { data } = await axios.get(backendUrl + "/api/jobs");
+      const { data } = await axiosInstance.get("/api/jobs");
       if (data.success) {
         setJobs(data.jobs);
       } else {
@@ -33,10 +32,10 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
-  // Fetch company data (for recruiter)
+  // ✅ Fetch company data (for recruiter)
   const fetchCompanyData = async () => {
     try {
-      const { data } = await axios.get(backendUrl + "/api/company/company", {
+      const { data } = await axiosInstance.get("/api/company/company", {
         headers: { token: companyToken },
       });
 
@@ -50,11 +49,11 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
-  // Fetch current user data
+  // ✅ Fetch current user data
   const fetchUserData = async () => {
     try {
       const token = await getToken();
-      const { data } = await axios.get(backendUrl + "/api/users/user", {
+      const { data } = await axiosInstance.get("/api/users/user", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -68,12 +67,11 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
-  // Fetch job applications by user
+  // ✅ Fetch job applications by user
   const fetchUserApplications = async () => {
     try {
       const token = await getToken();
-
-      const { data } = await axios.get(backendUrl + "/api/users/applications", {
+      const { data } = await axiosInstance.get("/api/users/applications", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -121,7 +119,6 @@ export const AppContextProvider = ({ children }) => {
     setUserData,
     userApplications,
     setUserApplications,
-    backendUrl,
     fetchUserData,
     fetchUserApplications,
   };

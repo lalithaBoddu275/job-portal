@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { AppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
-import axios from "axios";
+import axiosInstance from "../axiosInstance"; // ✅ use instance instead of axios
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -16,7 +16,6 @@ const Recruiterlogin = () => {
 
   const {
     setShowRecruiterLogin,
-    backendUrl,
     setCompanyToken,
     setCompanyData,
   } = useContext(AppContext);
@@ -34,7 +33,7 @@ const Recruiterlogin = () => {
 
     try {
       if (state === "login") {
-        const { data } = await axios.post(`${backendUrl}/api/company/login`, {
+        const { data } = await axiosInstance.post(`/api/company/login`, {
           email,
           password,
         });
@@ -60,10 +59,7 @@ const Recruiterlogin = () => {
         formData.append("email", email);
         formData.append("image", image);
 
-        const { data } = await axios.post(
-          `${backendUrl}/api/company/register`,
-          formData
-        );
+        const { data } = await axiosInstance.post(`/api/company/register`, formData);
 
         if (data.success) {
           toast.success("Account created successfully");
@@ -101,7 +97,6 @@ const Recruiterlogin = () => {
           Welcome back! Please {state === "login" ? "sign in" : "sign up"} to continue.
         </p>
 
-        {/* Signup - Image Upload Step */}
         {state === "signup" && isTextDataSubmitted ? (
           <div className="mb-5 text-center">
             <label htmlFor="image" className="cursor-pointer">

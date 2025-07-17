@@ -9,7 +9,7 @@ import moment from 'moment';
 import Footer from '../components/Footer';
 import JobCard from '../components/jobcard';
 import { toast } from 'react-toastify';
-import axios from 'axios';
+import axiosInstance from '../axiosInstance'; // ✅ use this
 import { useAuth } from '@clerk/clerk-react';
 
 const Applyjob = () => {
@@ -22,14 +22,13 @@ const Applyjob = () => {
 
   const {
     jobs,
-    backendUrl,
     userData,
     userApplications = [],
   } = useContext(AppContext);
 
   const fetchJob = async () => {
     try {
-      const { data } = await axios.get(`${backendUrl}/api/jobs/${id}`);
+      const { data } = await axiosInstance.get(`/api/jobs/${id}`);
       if (data.success) {
         setCurrentJob(data.job);
       } else {
@@ -51,14 +50,15 @@ const Applyjob = () => {
       }
 
       const token = await getToken();
-      const { data } = await axios.post(
-        `${backendUrl}/api/users/apply`,
+      const { data } = await axiosInstance.post(
+        `/api/users/apply`,
         { jobId: currentJob._id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (data.success) {
         toast.success(data.message);
+        setIsAlreadyApplied(true); // update status immediately
       } else {
         toast.error(data.message);
       }
@@ -132,9 +132,7 @@ const Applyjob = () => {
             </div>
           </div>
 
-          {/* Main Content */}
           <div className="flex flex-col lg:flex-row justify-between items-start px-6 sm:px-14 mt-10">
-            {/* Description Section */}
             <div className="w-full lg:w-2/3 mb-10">
               <h2 className="font-bold text-2xl mb-6">Job Description</h2>
               <div
@@ -152,7 +150,6 @@ const Applyjob = () => {
               </button>
             </div>
 
-            {/* More Jobs Section */}
             <div className="w-full lg:w-1/3 lg:ml-8 space-y-6">
               <h2 className="font-bold text-xl mb-4">More jobs from {currentJob?.companyId?.name}</h2>
               {jobs

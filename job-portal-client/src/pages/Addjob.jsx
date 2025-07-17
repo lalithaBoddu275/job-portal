@@ -3,7 +3,7 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import { JobCategories, JobLocations } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
-import axios from "axios";
+import axiosInstance from "../axiosInstance"; // ✅ use axiosInstance
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,13 +16,12 @@ const Addjob = () => {
   const [salary, setSalary] = useState(0);
   const editorRef = useRef(null);
   const quillRef = useRef(null);
-  const { backendUrl, companyToken } = useContext(AppContext);
+  const { companyToken } = useContext(AppContext);
   const navigate = useNavigate();
 
-  // 🚨 Redirect if not logged in as company
   useEffect(() => {
     if (!companyToken) {
-      navigate("/"); // or navigate to login
+      navigate("/");
     }
   }, [companyToken, navigate]);
 
@@ -44,10 +43,20 @@ const Addjob = () => {
     e.preventDefault();
     try {
       const description = quillRef.current?.root.innerHTML;
-      const { data } = await axios.post(
-        backendUrl + "/api/company/post-job",
-        { title, description, location, salary, category, level },
-        { headers: { token: companyToken } }
+
+      const { data } = await axiosInstance.post(
+        "/api/company/post-job",
+        {
+          title,
+          description,
+          location,
+          salary,
+          category,
+          level,
+        },
+        {
+          headers: { token: companyToken },
+        }
       );
 
       if (data.success) {
