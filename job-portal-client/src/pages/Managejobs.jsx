@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
-import axiosInstance from '../utils/axiosInstance'; // ✅ use your instance here
+import axiosInstance from '../axiosInstance'; // ✅ use your instance here
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 

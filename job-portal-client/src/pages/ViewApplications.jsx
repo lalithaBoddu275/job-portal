@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { assets } from '../assets/assets';
-import axiosInstance from '../utils/axiosInstance'; // ✅ Using axiosInstance
+import axiosInstance from '../axiosInstance'; // ✅ Using axiosInstance
 import Loading from '../components/Loading';
 import { AppContext } from '../context/AppContext';
 import { toast } from 'react-toastify';
