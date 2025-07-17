@@ -17,8 +17,13 @@ const app = express();
 // ✅ Clerk webhook - must come FIRST and use raw body
 app.post('/webhooks', bodyParser.raw({ type: 'application/json' }), clerkWebhooks);
 
-// ✅ Other middlewares AFTER webhook
-app.use(cors());
+// ✅ CORS configured to allow frontend with credentials
+app.use(cors({
+  origin: 'https://hirenestportal.vercel.app', // ✅ your Vercel frontend URL
+  credentials: true
+}));
+
+// ✅ Other middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(clerkMiddleware());
