@@ -10,7 +10,7 @@ import User from "../models/user.js"; // ✅ Required to fetch Clerk-based users
 export const registerCompany = async (req, res) => {
   const { name, email, password } = req.body;
   const imageFile = req.file;
-
+ 
   if (!name || !email || !password || !imageFile) {
     return res.status(400).json({ success: false, message: "Missing details" });
   }
