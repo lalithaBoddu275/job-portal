@@ -17,19 +17,35 @@ const app = express();
 // ✅ Clerk webhook - must come FIRST and use raw body
 app.post('/webhooks', bodyParser.raw({ type: 'application/json' }), clerkWebhooks);
 
-// ✅ CORS configured to allow frontend with credentials
+// ✅ Allowed origins (local + production)
+const allowedOrigins = [
+  "http://localhost:5173",               // local dev
+  "https://hirenestportal.vercel.app"    // Vercel prod
+];
+
 app.use(cors({
-  origin: 'https://hirenestportal.vercel.app', // ✅ your Vercel frontend URL
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow Postman, curl
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 }));
+
+// ✅ Handle preflight requests
+app.options('*', cors());
 
 // ✅ Other middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(clerkMiddleware());
 
+// ✅ Routes
 app.get('/', (req, res) => res.send('API working'));
-app.get("/debug-sentry", function mainHandler(req, res) {
+app.get('/debug-sentry', function mainHandler(req, res) {
   throw new Error("My first Sentry error!");
 });
 
@@ -39,7 +55,7 @@ app.use('/api/users', userRoutes);
 
 Sentry.setupExpressErrorHandler(app);
 
-// Connect DB & Cloudinary then start server
+// ✅ Connect DB & Cloudinary then start server
 (async () => {
   await connectDB();
   await connectCloudinary();
